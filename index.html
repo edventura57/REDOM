@@ -1,0 +1,3275 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>REDOM : Red Educativa Dominicana de Observación Meteorológica</title>
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+
+  <!-- ==================================================
+       CHART.JS
+       ================================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    html,
+    body {
+
+      margin: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      background:
+        #eef3f7;
+
+    }
+
+
+    /* ==================================================
+       ENCABEZADO
+       ================================================== */
+
+    header {
+
+      height: 78px;
+
+      background:
+        #2a5d84;
+
+      color:
+        white;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      padding:
+        10px 20px;
+
+      box-shadow:
+        0 2px 6px
+        rgba(0,0,0,0.25);
+
+    }
+
+
+    header h1 {
+
+      margin: 0;
+
+      font-size:
+        2.4rem;
+
+      font-weight:
+        700;
+
+      text-align:
+        center;
+
+    }
+
+
+    header span {
+
+      font-weight:
+        300;
+
+    }
+
+
+    /* ==================================================
+       AREA PRINCIPAL
+       ================================================== */
+
+    main {
+
+      width:
+        100%;
+
+      height:
+        calc(100vh - 78px);
+
+      display:
+        flex;
+
+    }
+
+
+    /* ==================================================
+       MAPA
+       ================================================== */
+
+    #mapWrap {
+
+      width:
+        52%;
+
+      height:
+        100%;
+
+      background:
+        #ddd;
+
+    }
+
+
+    #mapa {
+
+      width:
+        100%;
+
+      height:
+        100%;
+
+    }
+
+
+    /* ==================================================
+       PANEL DERECHO
+       ================================================== */
+
+    #panelDatos {
+
+      width:
+        48%;
+
+      height:
+        100%;
+
+      overflow-y:
+        auto;
+
+      padding:
+        14px;
+
+      background:
+        #eef3f7;
+
+    }
+
+
+    /* ==================================================
+       TARJETA DATOS ACTUALES
+       ================================================== */
+
+    .tarjetaActual {
+
+      background:
+        linear-gradient(
+          145deg,
+          #173f5b,
+          #0d2d43
+        );
+
+      color:
+        white;
+
+      border-radius:
+        14px;
+
+      padding:
+        18px;
+
+      margin-bottom:
+        14px;
+
+      box-shadow:
+        0 4px 14px
+        rgba(0,0,0,0.30);
+
+    }
+
+
+    /* ==================================================
+       ENCABEZADO ESTACION
+       ================================================== */
+
+    .encabezadoEstacion {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        flex-start;
+
+      border-bottom:
+        1px solid
+        rgba(255,255,255,0.25);
+
+      padding-bottom:
+        10px;
+
+      margin-bottom:
+        10px;
+
+    }
+
+
+    #codigoEstacion {
+
+      color:
+        #aee4ff;
+
+      font-size:
+        1.35rem;
+
+      font-weight:
+        bold;
+
+    }
+
+
+    #nombreEstacion {
+
+      color:
+        white;
+
+      font-size:
+        0.95rem;
+
+      margin-top:
+        4px;
+
+    }
+
+
+    .estado {
+
+      background:
+        rgba(86,190,110,0.20);
+
+      color:
+        #a8ffba;
+
+      border:
+        1px solid
+        rgba(168,255,186,0.4);
+
+      padding:
+        5px 10px;
+
+      border-radius:
+        15px;
+
+      font-size:
+        0.80rem;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    /* ==================================================
+       TEMPERATURA ACTUAL
+       ================================================== */
+
+    .temperaturaActual {
+
+      text-align:
+        center;
+
+      margin:
+        12px 0 15px 0;
+
+    }
+
+
+    #temperaturaPrincipal {
+
+      color:
+        #ffe600;
+
+      font-size:
+        4.4rem;
+
+      font-weight:
+        bold;
+
+      line-height:
+        1;
+
+      text-shadow:
+        1px 2px 4px
+        rgba(0,0,0,0.35);
+
+    }
+
+
+    /* ==================================================
+       VARIABLES ACTUALES
+       ================================================== */
+
+    .datosActualesGrid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:
+        8px 30px;
+
+      max-width:
+        650px;
+
+      margin:
+        0 auto;
+
+    }
+
+
+    .datoActual {
+
+      display:
+        flex;
+
+      justify-content:
+        space-between;
+
+      align-items:
+        center;
+
+      padding:
+        8px 3px;
+
+      border-bottom:
+        1px solid
+        rgba(255,255,255,0.12);
+
+    }
+
+
+    .datoActual .etiqueta {
+
+      color:
+        white;
+
+      font-size:
+        0.95rem;
+
+    }
+
+
+    .datoActual .valor {
+
+      color:
+        #fff6a0;
+
+      font-size:
+        1.05rem;
+
+      font-weight:
+        bold;
+
+      margin-left:
+        8px;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    /* ==================================================
+       ULTIMA LECTURA
+       ================================================== */
+
+    #ultimaLectura {
+
+      border-top:
+        1px solid
+        rgba(255,255,255,0.22);
+
+      margin-top:
+        14px;
+
+      padding-top:
+        9px;
+
+      color:
+        #d7e7f1;
+
+      font-size:
+        0.80rem;
+
+      text-align:
+        right;
+
+    }
+
+
+    /* ==================================================
+       HISTORICO
+       ================================================== */
+
+    .tarjetaHistorico {
+
+      background:
+        white;
+
+      border-radius:
+        14px;
+
+      padding:
+        17px;
+
+      margin-bottom:
+        14px;
+
+      box-shadow:
+        0 3px 10px
+        rgba(0,0,0,0.14);
+
+    }
+
+
+    .tituloHistorico {
+
+      color:
+        #2a5d84;
+
+      font-size:
+        1.2rem;
+
+      font-weight:
+        bold;
+
+      margin-bottom:
+        13px;
+
+    }
+
+
+    .estadisticas {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:
+        8px 15px;
+
+    }
+
+
+    .estadistica {
+
+      background:
+        #f3f6f8;
+
+      border-radius:
+        8px;
+
+      padding:
+        10px;
+
+    }
+
+
+    .estadistica .titulo {
+
+      color:
+        #555;
+
+      font-size:
+        0.82rem;
+
+    }
+
+
+    .estadistica .numero {
+
+      color:
+        #162c3b;
+
+      font-size:
+        1.15rem;
+
+      font-weight:
+        bold;
+
+      margin-top:
+        3px;
+
+    }
+
+
+    .estadistica .hora {
+
+      color:
+        #777;
+
+      font-size:
+        0.73rem;
+
+      margin-top:
+        3px;
+
+    }
+
+
+    #historicoEstado {
+
+      margin-top:
+        12px;
+
+      padding-top:
+        8px;
+
+      border-top:
+        1px solid #ddd;
+
+      color:
+        #777;
+
+      font-size:
+        0.75rem;
+
+      text-align:
+        right;
+
+    }
+
+
+    /* ==================================================
+       GRAFICOS
+       ================================================== */
+
+    .graficoCard {
+
+      background:
+        white;
+
+      border-radius:
+        13px;
+
+      padding:
+        13px 15px;
+
+      margin-bottom:
+        14px;
+
+      box-shadow:
+        0 2px 9px
+        rgba(0,0,0,0.12);
+
+    }
+
+
+    .graficoCard h3 {
+
+      margin:
+        2px 0 10px 0;
+
+      text-align:
+        center;
+
+      color:
+        #2a5d84;
+
+      font-size:
+        1.05rem;
+
+    }
+
+
+    .graficoContenedor {
+
+      position:
+        relative;
+
+      height:
+        220px;
+
+    }
+
+
+    /* ==================================================
+       MOVIL
+       ================================================== */
+
+    @media
+    (max-width: 950px) {
+
+      header {
+
+        height:
+          auto;
+
+      }
+
+
+      header h1 {
+
+        font-size:
+          1.7rem;
+
+      }
+
+
+      main {
+
+        display:
+          block;
+
+        height:
+          auto;
+
+      }
+
+
+      #mapWrap {
+
+        width:
+          100%;
+
+        height:
+          55vh;
+
+      }
+
+
+      #panelDatos {
+
+        width:
+          100%;
+
+        height:
+          auto;
+
+      }
+
+
+      .datosActualesGrid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+
+<body>
+
+
+<!-- ==================================================
+     ENCABEZADO
+     ================================================== -->
+
+<header>
+
+  <h1>
+
+    REDOM
+
+    <span>
+       : Red Educativa Dominicana de Observación Meteorológica
+    </span>
+
+  </h1>
+
+</header>
+
+
+
+<main>
+
+
+  <!-- ==================================================
+       MAPA
+       ================================================== -->
+
+  <section id="mapWrap" title="Marcador provisional: confirmar ubicación real de REDOM-001">
+
+    <div id="mapa"></div>
+
+  </section>
+
+
+
+  <!-- ==================================================
+       PANEL DERECHO
+       ================================================== -->
+
+  <section id="panelDatos">
+
+
+    <!-- ==================================================
+         DATOS ACTUALES
+         ================================================== -->
+
+    <div class="tarjetaActual">
+
+
+      <div class="encabezadoEstacion">
+
+
+        <div>
+
+          <div id="codigoEstacion">
+
+            REDOM
+
+          </div>
+
+
+          <div id="nombreEstacion">
+
+            Seleccione una estación
+
+          </div>
+
+        </div>
+
+
+
+        <div
+          class="estado"
+          id="estadoEstacion"
+        >
+
+          Esperando
+
+        </div>
+
+
+      </div>
+
+
+
+      <!-- TEMPERATURA -->
+
+      <div class="temperaturaActual">
+
+        <div id="temperaturaPrincipal">
+
+          -- °C
+
+        </div>
+
+      </div>
+
+
+
+      <!-- VARIABLES -->
+
+      <div class="datosActualesGrid">
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Humedad
+
+          </span>
+
+          <span
+            class="valor"
+            id="humedadPrincipal"
+          >
+
+            -- %
+
+          </span>
+
+        </div>
+
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Presión atmosférica
+
+          </span>
+
+          <span
+            class="valor"
+            id="presionPrincipal"
+          >
+
+            ---- hPa
+
+          </span>
+
+        </div>
+
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Viento
+
+          </span>
+
+          <span
+            class="valor"
+            id="vientoPrincipal"
+          >
+
+            -- m/s
+
+          </span>
+
+        </div>
+
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Dirección
+
+          </span>
+
+          <span
+            class="valor"
+            id="direccionPrincipal"
+          >
+
+            --
+
+          </span>
+
+        </div>
+
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Lluvia
+
+          </span>
+
+          <span
+            class="valor"
+            id="lluviaPrincipal"
+          >
+
+            -- mm
+
+          </span>
+
+        </div>
+
+
+
+        <div class="datoActual">
+
+          <span class="etiqueta">
+
+            Canal
+
+          </span>
+
+          <span
+            class="valor"
+            id="canalPrincipal"
+          >
+
+            --
+
+          </span>
+
+        </div>
+
+
+      </div>
+
+
+
+      <div id="ultimaLectura">
+
+        Esperando datos...
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         ULTIMAS 6 HORAS
+         ================================================== -->
+
+    <div class="tarjetaHistorico">
+
+
+      <div class="tituloHistorico">
+
+        Últimas 6 horas
+
+      </div>
+
+
+
+      <div class="estadisticas">
+
+
+        <!-- T MIN -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            T mínima
+
+          </div>
+
+          <div
+            class="numero"
+            id="tMin"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="tMinHora"
+          ></div>
+
+        </div>
+
+
+
+        <!-- T MAX -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            T máxima
+
+          </div>
+
+          <div
+            class="numero"
+            id="tMax"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="tMaxHora"
+          ></div>
+
+        </div>
+
+
+
+        <!-- H MIN -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            H mínima
+
+          </div>
+
+          <div
+            class="numero"
+            id="hMin"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="hMinHora"
+          ></div>
+
+        </div>
+
+
+
+        <!-- H MAX -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            H máxima
+
+          </div>
+
+          <div
+            class="numero"
+            id="hMax"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="hMaxHora"
+          ></div>
+
+        </div>
+
+
+
+        <!-- P MIN -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            P mínima
+
+          </div>
+
+          <div
+            class="numero"
+            id="pMin"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="pMinHora"
+          ></div>
+
+        </div>
+
+
+
+        <!-- P MAX -->
+
+        <div class="estadistica">
+
+          <div class="titulo">
+
+            P máxima
+
+          </div>
+
+          <div
+            class="numero"
+            id="pMax"
+          >
+
+            --
+
+          </div>
+
+          <div
+            class="hora"
+            id="pMaxHora"
+          ></div>
+
+        </div>
+
+
+      </div>
+
+
+
+      <div id="historicoEstado">
+
+        Esperando datos históricos...
+
+      </div>
+
+
+    </div>
+
+
+
+    <!-- ==================================================
+         TEMPERATURA
+         ================================================== -->
+
+    <div class="graficoCard">
+
+      <h3>
+
+        Temperatura — últimas 6 h
+
+      </h3>
+
+
+      <div class="graficoContenedor">
+
+        <canvas id="graficoTemperatura"></canvas>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         HUMEDAD
+         ================================================== -->
+
+    <div class="graficoCard">
+
+      <h3>
+
+        Humedad — últimas 6 h
+
+      </h3>
+
+
+      <div class="graficoContenedor">
+
+        <canvas id="graficoHumedad"></canvas>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         PRESION
+         ================================================== -->
+
+    <div class="graficoCard">
+
+      <h3>
+
+        Presión atmosférica — últimas 6 h
+
+      </h3>
+
+
+      <div class="graficoContenedor">
+
+        <canvas id="graficoPresion"></canvas>
+
+      </div>
+
+    </div>
+
+
+  </section>
+
+</main>
+
+
+
+<script>
+
+
+/* ==================================================
+   CONFIGURACION
+   ================================================== */
+
+const HORAS_HISTORICO =
+  6;
+
+
+const MINUTOS_HISTORICO =
+  HORAS_HISTORICO * 60;
+
+
+const ACTUALIZAR_ACTUAL_MS =
+  15000;
+
+
+const ACTUALIZAR_HISTORICO_MS =
+  60000;
+
+
+/*
+   Google Advanced Markers necesita Map ID.
+
+   Para pruebas puede mantenerse DEMO_MAP_ID.
+*/
+
+const GOOGLE_MAP_ID =
+  "DEMO_MAP_ID";
+
+
+
+/* ==================================================
+   ESTACIONES REDOM
+   ================================================== */
+
+// Solo se presenta la estación experimental; ubicación del marcador PROVISIONAL.
+// Confirmar coordenadas reales antes de una presentación institucional.
+const estaciones = [
+  {
+    codigo: "REDOM-001",
+    nombre: "Estación experimental (ubicación provisional)",
+    lat: 18.4910184,
+    lng: -69.8981749,
+    canalID: "3493287"
+  }
+];
+
+
+
+/* ==================================================
+   VARIABLES
+   ================================================== */
+
+let mapa;
+
+let infoWindow;
+
+let estacionActiva =
+  null;
+
+
+let timerActual =
+  null;
+
+
+let timerHistorico =
+  null;
+
+
+
+const graficos = {
+
+  temperatura:
+    null,
+
+  humedad:
+    null,
+
+  presion:
+    null
+
+};
+
+
+
+/* ==================================================
+   CONVERTIR VALOR
+   ================================================== */
+
+function numero(
+  valor
+) {
+
+
+  if (
+    valor === null ||
+    valor === undefined ||
+    valor === ""
+  ) {
+
+    return null;
+
+  }
+
+
+  const n =
+    parseFloat(
+      valor
+    );
+
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+
+}
+
+
+
+/* ==================================================
+   MOSTRAR VALOR
+   ================================================== */
+
+function mostrar(
+  valor,
+  decimales,
+  unidad
+) {
+
+
+  if (
+    valor === null
+  ) {
+
+    return "--";
+
+  }
+
+
+  return (
+    valor.toFixed(
+      decimales
+    ) +
+    " " +
+    unidad
+  );
+
+}
+
+
+
+/* ==================================================
+   HORA LOCAL
+   ================================================== */
+
+function horaLocal(
+  fecha
+) {
+
+
+  const d =
+    fecha instanceof Date
+      ?
+      fecha
+      :
+      new Date(
+        fecha
+      );
+
+
+  if (
+    Number.isNaN(
+      d.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  return d.toLocaleTimeString(
+
+    "es-DO",
+
+    {
+
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit"
+
+    }
+
+  );
+
+}
+
+
+
+/* ==================================================
+   FECHA Y HORA LOCAL
+   ================================================== */
+
+function fechaHoraLocal(
+  fecha
+) {
+
+
+  const d =
+    new Date(
+      fecha
+    );
+
+
+  if (
+    Number.isNaN(
+      d.getTime()
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  return d.toLocaleString(
+
+    "es-DO",
+
+    {
+
+      day:
+        "2-digit",
+
+      month:
+        "2-digit",
+
+      year:
+        "numeric",
+
+      hour:
+        "2-digit",
+
+      minute:
+        "2-digit",
+
+      second:
+        "2-digit"
+
+    }
+
+  );
+
+}
+
+
+
+/* ==================================================
+   URL ULTIMA LECTURA
+   ================================================== */
+
+
+function urlUltimaLectura(estacion) {
+
+  return (
+    "https://api.thingspeak.com/channels/" +
+    estacion.canalID +
+    "/feeds/last.json"
+  );
+
+}
+
+
+/* ==================================================
+   URL HISTORICO
+   ================================================== */
+
+function urlHistorial(estacion) {
+
+  return (
+    "https://api.thingspeak.com/channels/" +
+    estacion.canalID +
+    "/feeds.json?minutes=360&results=8000"
+  );
+
+}
+
+
+
+/* ==================================================
+   MOSTRAR DATOS ACTUALES
+   ================================================== */
+
+function mostrarDatosActuales(
+  estacion,
+  datos
+) {
+
+
+  const temperatura =
+    numero(
+      datos.field1
+    );
+
+
+  const humedad =
+    numero(
+      datos.field2
+    );
+
+
+  const presion =
+    numero(
+      datos.field3
+    );
+
+
+  const viento =
+    numero(
+      datos.field4
+    );
+
+
+  const direccion =
+    numero(
+      datos.field5
+    );
+
+
+  const lluvia =
+    numero(
+      datos.field6
+    );
+
+
+
+  document.getElementById(
+    "codigoEstacion"
+  ).textContent =
+
+    estacion.codigo;
+
+
+
+  document.getElementById(
+    "nombreEstacion"
+  ).textContent =
+
+    estacion.nombre;
+
+
+
+  document.getElementById(
+    "temperaturaPrincipal"
+  ).textContent =
+
+    mostrar(
+      temperatura,
+      1,
+      "°C"
+    );
+
+
+
+  document.getElementById(
+    "humedadPrincipal"
+  ).textContent =
+
+    mostrar(
+      humedad,
+      1,
+      "%"
+    );
+
+
+
+  document.getElementById(
+    "presionPrincipal"
+  ).textContent =
+
+    mostrar(
+      presion,
+      1,
+      "hPa"
+    );
+
+
+
+  document.getElementById(
+    "vientoPrincipal"
+  ).textContent =
+
+    mostrar(
+      viento,
+      1,
+      "km/h"
+    );
+
+
+
+  document.getElementById(
+    "direccionPrincipal"
+  ).textContent =
+
+    direccion === null
+      ?
+      "--"
+      :
+      direccion.toFixed(0) +
+      "° " + (["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSO","SO","OSO","O","ONO","NO","NNO"][Math.round(((direccion % 360) + 360) % 360 / 22.5) % 16]);
+
+
+
+  document.getElementById(
+    "lluviaPrincipal"
+  ).textContent =
+
+    mostrar(
+      lluvia,
+      1,
+      "mm"
+    );
+
+
+
+  document.getElementById(
+    "canalPrincipal"
+  ).textContent =
+
+    estacion.canalID;
+
+
+
+  if (
+    datos.created_at
+  ) {
+
+
+    document.getElementById(
+      "ultimaLectura"
+    ).textContent =
+
+      "Última lectura: " +
+
+      fechaHoraLocal(
+        datos.created_at
+      );
+
+  }
+
+
+  document.getElementById(
+    "estadoEstacion"
+  ).textContent =
+
+    (datos.created_at && (Date.now() - Date.parse(datos.created_at)) < 5 * 60 * 1000)
+      ? "En línea" : "Sin datos recientes";
+
+}
+
+
+
+/* ==================================================
+   CARGAR ACTUAL
+   ================================================== */
+
+async function cargarActual(
+  estacion
+) {
+
+
+  const codigoSolicitado =
+    estacion.codigo;
+
+
+  try {
+
+
+    const respuesta =
+      await fetch(
+
+        urlUltimaLectura(
+          estacion
+        ),
+
+        {
+
+          cache:
+            "no-store"
+
+        }
+
+      );
+
+
+    if (
+      !respuesta.ok
+    ) {
+
+      throw new Error(
+
+        "HTTP " +
+        respuesta.status
+
+      );
+
+    }
+
+
+    const datos =
+      await respuesta.json();
+
+
+
+    if (
+      !estacionActiva ||
+      estacionActiva.codigo !==
+      codigoSolicitado
+    ) {
+
+      return;
+
+    }
+
+
+
+    mostrarDatosActuales(
+
+      estacion,
+
+      datos
+
+    );
+
+
+  }
+
+
+  catch (
+    error
+  ) {
+
+
+    console.error(
+
+      "Error datos actuales:",
+
+      error
+
+    );
+
+
+    if (
+      estacionActiva &&
+      estacionActiva.codigo ===
+      codigoSolicitado
+    ) {
+
+
+      document.getElementById(
+        "estadoEstacion"
+      ).textContent =
+
+        "Sin comunicación";
+
+    }
+
+  }
+
+}
+
+
+
+/* ==================================================
+   MINIMO Y MAXIMO
+   ================================================== */
+
+function estadisticasCampo(
+  feeds,
+  campo
+) {
+
+
+  const valores =
+    feeds
+
+      .map(
+        feed => {
+
+
+          const valor =
+            numero(
+              feed[campo]
+            );
+
+
+          const fecha =
+            new Date(
+              feed.created_at
+            );
+
+
+          return {
+
+            valor:
+              valor,
+
+            fecha:
+              fecha
+
+          };
+
+        }
+      )
+
+      .filter(
+        item =>
+
+          item.valor !==
+            null &&
+
+          !Number.isNaN(
+            item.fecha.getTime()
+          )
+
+      );
+
+
+
+  if (
+    valores.length ===
+    0
+  ) {
+
+    return null;
+
+  }
+
+
+
+  let minimo =
+    valores[0];
+
+
+  let maximo =
+    valores[0];
+
+
+
+  valores.forEach(
+    item => {
+
+
+      if (
+        item.valor <
+        minimo.valor
+      ) {
+
+        minimo =
+          item;
+
+      }
+
+
+      if (
+        item.valor >
+        maximo.valor
+      ) {
+
+        maximo =
+          item;
+
+      }
+
+    }
+  );
+
+
+
+  return {
+
+    minimo:
+      minimo,
+
+    maximo:
+      maximo
+
+  };
+
+}
+
+
+
+/* ==================================================
+   MOSTRAR MIN Y MAX
+   ================================================== */
+
+function mostrarEstadistica(
+
+  idMin,
+
+  idMinHora,
+
+  idMax,
+
+  idMaxHora,
+
+  datos,
+
+  decimales,
+
+  unidad
+
+) {
+
+
+  if (
+    !datos
+  ) {
+
+
+    document.getElementById(
+      idMin
+    ).textContent =
+      "--";
+
+
+    document.getElementById(
+      idMax
+    ).textContent =
+      "--";
+
+
+    document.getElementById(
+      idMinHora
+    ).textContent =
+      "";
+
+
+    document.getElementById(
+      idMaxHora
+    ).textContent =
+      "";
+
+
+    return;
+
+  }
+
+
+
+  document.getElementById(
+    idMin
+  ).textContent =
+
+    datos.minimo.valor
+      .toFixed(
+        decimales
+      ) +
+
+    " " +
+    unidad;
+
+
+
+  document.getElementById(
+    idMax
+  ).textContent =
+
+    datos.maximo.valor
+      .toFixed(
+        decimales
+      ) +
+
+    " " +
+    unidad;
+
+
+
+  document.getElementById(
+    idMinHora
+  ).textContent =
+
+    "a las " +
+
+    horaLocal(
+      datos.minimo.fecha
+    );
+
+
+
+  document.getElementById(
+    idMaxHora
+  ).textContent =
+
+    "a las " +
+
+    horaLocal(
+      datos.maximo.fecha
+    );
+
+}
+
+
+
+/* ==================================================
+   PREPARAR SERIES
+   ================================================== */
+
+function prepararSerie(
+  feeds,
+  campo
+) {
+
+
+  const puntos =
+    feeds
+
+      .map(
+        feed => {
+
+
+          return {
+
+            x:
+
+              new Date(
+                feed.created_at
+              ).getTime(),
+
+            y:
+
+              numero(
+                feed[campo]
+              )
+
+          };
+
+        }
+      )
+
+      .filter(
+        punto =>
+
+          Number.isFinite(
+            punto.x
+          ) &&
+
+          punto.y !==
+            null
+
+      )
+
+      .sort(
+        (a,b) =>
+          a.x -
+          b.x
+      );
+
+
+
+  const resultado =
+    [];
+
+
+  let anterior =
+    null;
+
+
+
+  puntos.forEach(
+    punto => {
+
+
+      /*
+        Si pasa más de 90 segundos
+        sin datos, se rompe la línea.
+      */
+
+      if (
+
+        anterior &&
+
+        punto.x -
+        anterior.x >
+
+        90000
+
+      ) {
+
+
+        resultado.push(
+
+          {
+
+            x:
+              anterior.x +
+              1,
+
+            y:
+              null
+
+          }
+
+        );
+
+
+        resultado.push(
+
+          {
+
+            x:
+              punto.x -
+              1,
+
+            y:
+              null
+
+          }
+
+        );
+
+      }
+
+
+
+      resultado.push(
+        punto
+      );
+
+
+      anterior =
+        punto;
+
+    }
+
+  );
+
+
+
+  return resultado;
+
+}
+
+
+
+/* ==================================================
+   GRAFICOS
+   ================================================== */
+
+function actualizarGrafico(
+
+  nombreGrafico,
+
+  canvasID,
+
+  etiqueta,
+
+  unidad,
+
+  decimales,
+
+  datos,
+
+  color
+
+) {
+
+
+  const ahora =
+    Date.now();
+
+
+  const inicio =
+
+    ahora -
+
+    HORAS_HISTORICO *
+    60 *
+    60 *
+    1000;
+
+
+
+  if (
+    graficos[
+      nombreGrafico
+    ]
+  ) {
+
+
+    const grafico =
+
+      graficos[
+        nombreGrafico
+      ];
+
+
+
+    grafico.data
+      .datasets[0]
+      .data =
+        datos;
+
+
+
+    grafico.options
+      .scales.x.min =
+        inicio;
+
+
+
+    grafico.options
+      .scales.x.max =
+        ahora;
+
+
+
+    grafico.update(
+      "none"
+    );
+
+
+    return;
+
+  }
+
+
+
+  const contexto =
+
+    document
+      .getElementById(
+        canvasID
+      )
+      .getContext(
+        "2d"
+      );
+
+
+
+  graficos[
+    nombreGrafico
+  ] =
+
+    new Chart(
+
+      contexto,
+
+      {
+
+
+        type:
+          "line",
+
+
+
+        data: {
+
+          datasets: [
+
+            {
+
+              label:
+                etiqueta,
+
+              data:
+                datos,
+
+              borderColor:
+                color,
+
+              backgroundColor:
+                color,
+
+              borderWidth:
+                2,
+
+              pointRadius:
+                0,
+
+              pointHoverRadius:
+                5,
+
+              tension:
+                0.20,
+
+              spanGaps:
+                false
+
+            }
+
+          ]
+
+        },
+
+
+
+        options: {
+
+
+          responsive:
+            true,
+
+
+          maintainAspectRatio:
+            false,
+
+
+          animation:
+            false,
+
+
+          parsing:
+            false,
+
+
+          interaction: {
+
+            intersect:
+              false,
+
+            mode:
+              "nearest"
+
+          },
+
+
+          plugins: {
+
+
+            legend: {
+
+              display:
+                false
+
+            },
+
+
+            tooltip: {
+
+
+              callbacks: {
+
+
+                title:
+                  function(
+                    items
+                  ) {
+
+
+                    if (
+                      !items.length
+                    ) {
+
+                      return "";
+
+                    }
+
+
+                    return fechaHoraLocal(
+
+                      items[0]
+                        .parsed.x
+
+                    );
+
+                  },
+
+
+                label:
+                  function(
+                    item
+                  ) {
+
+
+                    return (
+
+                      etiqueta +
+                      ": " +
+
+                      item.parsed.y
+                        .toFixed(
+                          decimales
+                        ) +
+
+                      " " +
+                      unidad
+
+                    );
+
+                  }
+
+              }
+
+            }
+
+          },
+
+
+          scales: {
+
+
+            x: {
+
+
+              type:
+                "linear",
+
+
+              min:
+                inicio,
+
+
+              max:
+                ahora,
+
+
+              grid: {
+
+                display:
+                  false
+
+              },
+
+
+              ticks: {
+
+
+                maxTicksLimit:
+                  7,
+
+
+                callback:
+                  function(
+                    valor
+                  ) {
+
+
+                    return horaLocal(
+
+                      new Date(
+                        Number(
+                          valor
+                        )
+                      )
+
+                    );
+
+                  }
+
+              }
+
+            },
+
+
+            y: {
+
+
+              ticks: {
+
+
+                callback:
+                  function(
+                    valor
+                  ) {
+
+
+                    return (
+
+                      valor +
+                      " " +
+                      unidad
+
+                    );
+
+                  }
+
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    );
+
+}
+
+
+
+/* ==================================================
+   CARGAR HISTORICO
+   ================================================== */
+
+async function cargarHistorico(
+  estacion
+) {
+
+
+  const codigoSolicitado =
+    estacion.codigo;
+
+
+  try {
+
+
+    document.getElementById(
+      "historicoEstado"
+    ).textContent =
+
+      "Actualizando últimas 6 horas...";
+
+
+
+    const respuesta =
+      await fetch(
+
+        urlHistorial(
+          estacion
+        ),
+
+        {
+
+          cache:
+            "no-store"
+
+        }
+
+      );
+
+
+    if (
+      !respuesta.ok
+    ) {
+
+      throw new Error(
+
+        "HTTP " +
+        respuesta.status
+
+      );
+
+    }
+
+
+
+    const datos =
+      await respuesta.json();
+
+
+
+    if (
+
+      !estacionActiva ||
+
+      estacionActiva.codigo !==
+        codigoSolicitado
+
+    ) {
+
+      return;
+
+    }
+
+
+
+    const feeds =
+
+      Array.isArray(
+        datos.feeds
+      )
+
+      ?
+
+      datos.feeds
+
+      :
+
+      [];
+
+
+
+    /* ==================================================
+       ESTADISTICAS
+       ================================================== */
+
+    const estadTemp =
+
+      estadisticasCampo(
+
+        feeds,
+
+        "field1"
+
+      );
+
+
+
+    const estadHum =
+
+      estadisticasCampo(
+
+        feeds,
+
+        "field2"
+
+      );
+
+
+
+    const estadPres =
+
+      estadisticasCampo(
+
+        feeds,
+
+        "field3"
+
+      );
+
+
+
+    mostrarEstadistica(
+
+      "tMin",
+
+      "tMinHora",
+
+      "tMax",
+
+      "tMaxHora",
+
+      estadTemp,
+
+      1,
+
+      "°C"
+
+    );
+
+
+
+    mostrarEstadistica(
+
+      "hMin",
+
+      "hMinHora",
+
+      "hMax",
+
+      "hMaxHora",
+
+      estadHum,
+
+      1,
+
+      "%"
+
+    );
+
+
+
+    mostrarEstadistica(
+
+      "pMin",
+
+      "pMinHora",
+
+      "pMax",
+
+      "pMaxHora",
+
+      estadPres,
+
+      1,
+
+      "hPa"
+
+    );
+
+
+
+    /* ==================================================
+       SERIES
+       ================================================== */
+
+    const serieTemp =
+
+      prepararSerie(
+
+        feeds,
+
+        "field1"
+
+      );
+
+
+
+    const serieHum =
+
+      prepararSerie(
+
+        feeds,
+
+        "field2"
+
+      );
+
+
+
+    const seriePres =
+
+      prepararSerie(
+
+        feeds,
+
+        "field3"
+
+      );
+
+
+
+    actualizarGrafico(
+
+      "temperatura",
+
+      "graficoTemperatura",
+
+      "Temperatura",
+
+      "°C",
+
+      1,
+
+      serieTemp,
+
+      "#e34c36"
+
+    );
+
+
+
+    actualizarGrafico(
+
+      "humedad",
+
+      "graficoHumedad",
+
+      "Humedad",
+
+      "%",
+
+      1,
+
+      serieHum,
+
+      "#2476bd"
+
+    );
+
+
+
+    actualizarGrafico(
+
+      "presion",
+
+      "graficoPresion",
+
+      "Presión",
+
+      "hPa",
+
+      1,
+
+      seriePres,
+
+      "#39885a"
+
+    );
+
+
+
+    if (
+      feeds.length ===
+      0
+    ) {
+
+
+      document.getElementById(
+        "historicoEstado"
+      ).textContent =
+
+        "No hay registros disponibles en las últimas 6 horas.";
+
+
+    }
+
+    else {
+
+
+      document.getElementById(
+        "historicoEstado"
+      ).textContent =
+
+        feeds.length +
+
+        " registros analizados · actualizado " +
+
+        horaLocal(
+          new Date()
+        );
+
+    }
+
+
+  }
+
+
+  catch (
+    error
+  ) {
+
+
+    console.error(
+
+      "Error histórico:",
+
+      error
+
+    );
+
+
+    document.getElementById(
+      "historicoEstado"
+    ).textContent =
+
+      "No se pudieron obtener los datos históricos.";
+
+  }
+
+}
+
+
+
+/* ==================================================
+   SELECCIONAR ESTACION
+   ================================================== */
+
+function seleccionarEstacion(
+  estacion
+) {
+
+
+  estacionActiva =
+    estacion;
+
+
+
+  document.getElementById(
+    "codigoEstacion"
+  ).textContent =
+
+    estacion.codigo;
+
+
+
+  document.getElementById(
+    "nombreEstacion"
+  ).textContent =
+
+    estacion.nombre;
+
+
+
+  document.getElementById(
+    "canalPrincipal"
+  ).textContent =
+
+    estacion.canalID;
+
+
+
+  document.getElementById(
+    "estadoEstacion"
+  ).textContent =
+
+    "Actualizando...";
+
+
+
+  /* --------------------------------
+     CANCELAR TEMPORIZADORES
+     -------------------------------- */
+
+  if (
+    timerActual
+  ) {
+
+    clearInterval(
+      timerActual
+    );
+
+  }
+
+
+  if (
+    timerHistorico
+  ) {
+
+    clearInterval(
+      timerHistorico
+    );
+
+  }
+
+
+
+  /* --------------------------------
+     PRIMERA CARGA
+     -------------------------------- */
+
+  cargarActual(
+    estacion
+  );
+
+
+  cargarHistorico(
+    estacion
+  );
+
+
+
+  /* --------------------------------
+     ACTUALIZACIONES
+     -------------------------------- */
+
+  timerActual =
+
+    setInterval(
+
+      () => {
+
+        cargarActual(
+          estacion
+        );
+
+      },
+
+      ACTUALIZAR_ACTUAL_MS
+
+    );
+
+
+
+  timerHistorico =
+
+    setInterval(
+
+      () => {
+
+        cargarHistorico(
+          estacion
+        );
+
+      },
+
+      ACTUALIZAR_HISTORICO_MS
+
+    );
+
+}
+
+
+
+/* ==================================================
+   GOOGLE MAPS
+   ================================================== */
+
+async function initMap() {
+
+
+  const {
+
+    Map,
+
+    InfoWindow
+
+  } =
+
+    await google.maps
+      .importLibrary(
+        "maps"
+      );
+
+
+
+  const {
+
+    AdvancedMarkerElement
+
+  } =
+
+    await google.maps
+      .importLibrary(
+        "marker"
+      );
+
+
+
+  /* ==================================================
+     CREAR MAPA
+     ================================================== */
+
+  mapa =
+
+    new Map(
+
+      document.getElementById(
+        "mapa"
+      ),
+
+      {
+
+
+        center: {
+
+          lat:
+            18.9,
+
+          lng:
+            -70.3
+
+        },
+
+
+        zoom:
+          8,
+
+
+        mapId:
+          GOOGLE_MAP_ID,
+
+
+        mapTypeId:
+          "roadmap",
+
+
+        mapTypeControl:
+          true,
+
+
+        mapTypeControlOptions: {
+
+
+          style:
+
+            google.maps
+              .MapTypeControlStyle
+              .HORIZONTAL_BAR,
+
+
+          position:
+
+            google.maps
+              .ControlPosition
+              .TOP_RIGHT,
+
+
+          mapTypeIds: [
+
+            "roadmap",
+
+            "satellite",
+
+            "hybrid",
+
+            "terrain"
+
+          ]
+
+        },
+
+
+        fullscreenControl:
+          true,
+
+
+        streetViewControl:
+          true,
+
+
+        scaleControl:
+          true,
+
+
+        zoomControl:
+          true
+
+      }
+
+    );
+
+
+
+  infoWindow =
+
+    new InfoWindow();
+
+
+
+  /* ==================================================
+     MARCADORES
+     ================================================== */
+
+  estaciones.forEach(
+
+    estacion => {
+
+
+      const marcador =
+
+        new AdvancedMarkerElement(
+
+          {
+
+
+            map:
+              mapa,
+
+
+            position: {
+
+              lat:
+                estacion.lat,
+
+              lng:
+                estacion.lng
+
+            },
+
+
+            title:
+
+              estacion.codigo +
+
+              " - " +
+
+              estacion.nombre
+
+          }
+
+        );
+
+
+
+      marcador.addListener(
+
+        "click",
+
+        () => {
+
+
+          seleccionarEstacion(
+            estacion
+          );
+
+
+
+          infoWindow.setContent(
+
+            "<div style='font-size:14px'>" +
+
+            "<strong>" +
+            estacion.codigo +
+            "</strong><br>" +
+
+            estacion.nombre +
+
+            "</div>"
+
+          );
+
+
+
+          infoWindow.open({
+
+            map:
+              mapa,
+
+            anchor:
+              marcador
+
+          });
+
+        }
+
+      );
+
+    }
+
+  );
+
+
+
+  /* ==================================================
+     ESTACION INICIAL
+     ================================================== */
+
+  if (
+    estaciones.length >
+    0
+  ) {
+
+    seleccionarEstacion(
+
+      estaciones[0]
+
+    );
+
+  }
+
+}
+
+
+
+/* ==================================================
+   GOOGLE CALLBACK
+   ================================================== */
+
+window.initMap =
+  initMap;
+
+
+</script>
+
+
+
+<!-- ==================================================
+     GOOGLE MAPS API
+
+     REEMPLACE:
+
+     SU_API_KEY_GOOGLE
+
+     POR SU CLAVE REAL.
+     ================================================== -->
+
+<script
+  async
+  src="https://maps.googleapis.com/maps/api/js?key=REEMPLAZAR_CON_NUEVA_CLAVE_GOOGLE_MAPS&callback=initMap">
+</script>
+
+
+</body>
+
+</html>
